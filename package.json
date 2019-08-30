@@ -1,5 +1,5 @@
 {
-  "name": "holidates",
+  "name": "@prtj/holidates",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -22,6 +22,15 @@
   "dependencies": {
     "axios": "^0.19.0",
     "chalk": "^2.4.2",
-    "country-list": "^2.2.0"
+    "chalk-animation": "^1.6.0",
+    "clear": "^0.1.0",
+    "country-list": "^2.2.0",
+    "figlet": "^1.2.3",
+    "inquirer": "^7.0.0",
+    "ora": "^3.4.0",
+    "prompt": "^1.0.0",
+    "prompt-input": "^3.0.0",
+    "prompts": "^2.2.1",
+    "readline": "^1.3.0"
   }
 }

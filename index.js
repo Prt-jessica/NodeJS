@@ -1,42 +1,70 @@
 #!/usr/bin/env node
 
-const chalk = require("chalk");
-
-console.log("adios world");
-
 const axios = require('axios');
-const {
-    getCode,
-    getName
-} = require('country-list');
+const country = require("country-list");
+const chalk = require('chalk');
+const figlet = require('figlet');
+const ora = require('ora');
+const chalkAnimation = require('chalk-animation');
+const prompts = require('prompts');
+const clear = require("clear");
+const uri = "https://date.nager.at/api/v2/publicholidays/";
 
+const questions = [{
+        type: "text",
+        name: "chooseCountry",
+        message: "Choose a country ? "
+    },
+    {
+        type: "number",
+        name: "chooseYear",
+        message: "Choose a year ? "
 
-
-let country = "";
-let date = "";
-process.argv.forEach((valeur, index) => {
-    console.log(`${index}: ${valeur}`);
-
-    if (index == 2) {
-        country = valeur;
     }
-    if (index == 3) {
-        date = valeur;
+];
+
+let holiday = async () => {
+    const response = await prompts(questions);
+
+    let thisCountry = response.chooseCountry;
+    let thisYear = response.chooseYear;
+
+    if (thisYear == "") {
+        thisYear = new Date().getFullYear(); // Prend l'année en cours si on entre pas de date
     }
-});
 
-let countryCode = getCode(country);
+    let countryCode = country.getCode(thisCountry); // On recupère le code du pays
 
-if (date == "") {
-
-    date = new Date().getFullYear();
-}
-
-axios.get(`https://date.nager.at/api/v2/PublicHolidays/${date}/${countryCode}`).then(function (reponse) {
-    // console.log(reponse.data);
+    try {
+        const result = await axios.get(`${uri}${thisYear}/${countryCode}`);
 
 
-    for (let i = 0; i < reponse.data.length; i++) {
-        console.log(`${reponse.data[i].date} ${chalk.magenta(reponse.data[i].localName)} `);
+        console.log(chalk.magenta(figlet.textSync('Holidays', {
+            font: 'Standard',
+            horizontalLayout: 'fitted',
+            verticalLayout: 'default'
+        })));
+
+
+        let holidays = Array.from(result.data); // On récupère sous forme d'un tableau
+
+        const rainbow = chalkAnimation.rainbow(`This is a list of holidays in ${thisCountry}, ${thisYear} :`).stop(); // Don't start the animation
+
+        rainbow.render(); // Display the first frame
+
+        const frame = rainbow.frame(); // Get the second frame
+        console.log(frame);
+
+
+        holidays.forEach(el => {
+            console.log(`${el.date} : ${el.name}.`);
+        });
+    } catch (err) {
+        console.log(
+            chalk.bgRed("Incorrect values. Please try again : "));
+        holiday();
     }
-})
+};
+
+clear();
+holiday();
